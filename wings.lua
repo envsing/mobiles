@@ -611,136 +611,121 @@ MiscTab:CreateToggle({
 
 MiscTab:CreateSection("Aimbot")
 
-MiscTab:CreateButton({
+MiscTab:CreateToggle({
     Name = "Aimbot",
-    Callback = function()
-        if game.CoreGui:FindFirstChild("WingsAimbot") then return end
+    CurrentValue = false,
+    Flag = "AimbotMenuToggle",
+    Callback = function(Value)
+        local existing = game.CoreGui:FindFirstChild("WingsAimbot")
+        if Value then
+            if existing then return end
 
-        local AimbotEnabled = false
-        local IgnoreFriends = false
-        local LockedTarget = nil
-        local Camera = workspace.CurrentCamera
+            local AimbotEnabled = false
+            local IgnoreFriends = false
+            local LockedTarget = nil
+            local Camera = workspace.CurrentCamera
 
-        local gui = Instance.new("ScreenGui")
-        gui.Name = "WingsAimbot"
-        gui.ResetOnSpawn = false
-        gui.Parent = game.CoreGui
+            local gui = Instance.new("ScreenGui")
+            gui.Name = "WingsAimbot"
+            gui.ResetOnSpawn = false
+            gui.Parent = game.CoreGui
 
-        local frame = Instance.new("Frame", gui)
-        frame.Size = UDim2.new(0, 200, 0, 160)
-        frame.Position = UDim2.new(0.5, -100, 0.5, -80)
-        frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-        frame.BorderSizePixel = 0
-        frame.Active = true
-        frame.Draggable = true
+            local frame = Instance.new("Frame", gui)
+            frame.Size = UDim2.new(0, 200, 0, 130)
+            frame.Position = UDim2.new(0.5, -100, 0.5, -65)
+            frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+            frame.BorderSizePixel = 0
+            frame.Active = true
+            frame.Draggable = true
 
-        local corner = Instance.new("UICorner", frame)
-        corner.CornerRadius = UDim.new(0, 8)
+            local corner = Instance.new("UICorner", frame)
+            corner.CornerRadius = UDim.new(0, 8)
 
-        local title = Instance.new("TextLabel", frame)
-        title.Size = UDim2.new(1, 0, 0, 35)
-        title.Text = "Aimbot"
-        title.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-        title.TextColor3 = Color3.new(1,1,1)
-        title.Font = Enum.Font.FredokaOne
-        title.TextSize = 18
-        title.BorderSizePixel = 0
-        Instance.new("UICorner", title).CornerRadius = UDim.new(0, 8)
+            local title = Instance.new("TextLabel", frame)
+            title.Size = UDim2.new(1, 0, 0, 35)
+            title.Text = "Aim"
+            title.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+            title.TextColor3 = Color3.new(1,1,1)
+            title.Font = Enum.Font.FredokaOne
+            title.TextSize = 18
+            title.BorderSizePixel = 0
+            Instance.new("UICorner", title).CornerRadius = UDim.new(0, 8)
 
-        local toggle = Instance.new("TextButton", frame)
-        toggle.Position = UDim2.new(0, 10, 0, 45)
-        toggle.Size = UDim2.new(1, -20, 0, 35)
-        toggle.Text = "Aimbot: OFF"
-        toggle.Font = Enum.Font.SourceSansBold
-        toggle.TextSize = 16
-        toggle.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-        toggle.TextColor3 = Color3.fromRGB(255, 80, 80)
-        Instance.new("UICorner", toggle)
+            local toggleBtn = Instance.new("TextButton", frame)
+            toggleBtn.Position = UDim2.new(0, 10, 0, 45)
+            toggleBtn.Size = UDim2.new(1, -20, 0, 35)
+            toggleBtn.Text = "Aimbot: OFF"
+            toggleBtn.Font = Enum.Font.SourceSansBold
+            toggleBtn.TextSize = 16
+            toggleBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+            toggleBtn.TextColor3 = Color3.fromRGB(255, 80, 80)
+            Instance.new("UICorner", toggleBtn)
 
-        toggle.MouseButton1Click:Connect(function()
-            AimbotEnabled = not AimbotEnabled
-            toggle.Text = "Aimbot: " .. (AimbotEnabled and "ON" or "OFF")
-            toggle.TextColor3 = AimbotEnabled and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
-            if not AimbotEnabled then LockedTarget = nil end
-        end)
+            toggleBtn.MouseButton1Click:Connect(function()
+                AimbotEnabled = not AimbotEnabled
+                toggleBtn.Text = "Aimbot: " .. (AimbotEnabled and "ON" or "OFF")
+                toggleBtn.TextColor3 = AimbotEnabled and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
+                if not AimbotEnabled then LockedTarget = nil end
+            end)
 
-        local friendToggle = Instance.new("TextButton", frame)
-        friendToggle.Position = UDim2.new(0, 10, 0, 85)
-        friendToggle.Size = UDim2.new(1, -20, 0, 35)
-        friendToggle.Text = "Ignore Friends: OFF"
-        friendToggle.Font = Enum.Font.SourceSansBold
-        friendToggle.TextSize = 16
-        friendToggle.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-        friendToggle.TextColor3 = Color3.fromRGB(255, 80, 80)
-        Instance.new("UICorner", friendToggle)
+            local friendToggle = Instance.new("TextButton", frame)
+            friendToggle.Position = UDim2.new(0, 10, 0, 85)
+            friendToggle.Size = UDim2.new(1, -20, 0, 35)
+            friendToggle.Text = "Ignore Friends: OFF"
+            friendToggle.Font = Enum.Font.SourceSansBold
+            friendToggle.TextSize = 16
+            friendToggle.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+            friendToggle.TextColor3 = Color3.fromRGB(255, 80, 80)
+            Instance.new("UICorner", friendToggle)
 
-        friendToggle.MouseButton1Click:Connect(function()
-            IgnoreFriends = not IgnoreFriends
-            friendToggle.Text = "Ignore Friends: " .. (IgnoreFriends and "ON" or "OFF")
-            friendToggle.TextColor3 = IgnoreFriends and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
-        end)
+            friendToggle.MouseButton1Click:Connect(function()
+                IgnoreFriends = not IgnoreFriends
+                friendToggle.Text = "Ignore Friends: " .. (IgnoreFriends and "ON" or "OFF")
+                friendToggle.TextColor3 = IgnoreFriends and Color3.fromRGB(80, 255, 80) or Color3.fromRGB(255, 80, 80)
+            end)
 
-        local close = Instance.new("TextButton", frame)
-        close.Position = UDim2.new(0, 10, 0, 125)
-        close.Size = UDim2.new(1, -20, 0, 25)
-        close.Text = "Fechar"
-        close.Font = Enum.Font.SourceSansBold
-        close.TextSize = 14
-        close.BackgroundColor3 = Color3.fromRGB(60, 20, 20)
-        close.TextColor3 = Color3.new(1,1,1)
-        Instance.new("UICorner", close)
-
-        close.MouseButton1Click:Connect(function()
-            gui:Destroy()
-        end)
-
-        local function getClosestEnemy()
-            local closest, closestDist = nil, 150
-            for _, plr in ipairs(game:GetService("Players"):GetPlayers()) do
-                if plr ~= game:GetService("Players").LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
-                    if IgnoreFriends and game:GetService("Players").LocalPlayer:IsFriendsWith(plr.UserId) then continue end
-                    -- Team check hardcoded (true by default)
-                    if plr.Team and plr.Team == game:GetService("Players").LocalPlayer.Team then continue end
-                    
-                    local part = plr.Character.Head
-                    local screenPoint, onScreen = Camera:WorldToViewportPoint(part.Position)
-                    if onScreen then
-                        local dist = (Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2) - Vector2.new(screenPoint.X, screenPoint.Y)).Magnitude
-                        if dist < closestDist then
-                            closestDist = dist
-                            closest = plr
+            local function getClosestEnemy()
+                local closest, closestDist = nil, 150
+                for _, plr in ipairs(game:GetService("Players"):GetPlayers()) do
+                    if plr ~= game:GetService("Players").LocalPlayer and plr.Character and plr.Character:FindFirstChild("Head") then
+                        if IgnoreFriends and game:GetService("Players").LocalPlayer:IsFriendsWith(plr.UserId) then continue end
+                        if plr.Team and plr.Team == game:GetService("Players").LocalPlayer.Team then continue end
+                        
+                        local part = plr.Character.Head
+                        local screenPoint, onScreen = Camera:WorldToViewportPoint(part.Position)
+                        if onScreen then
+                            local dist = (Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2) - Vector2.new(screenPoint.X, screenPoint.Y)).Magnitude
+                            if dist < closestDist then
+                                closestDist = dist
+                                closest = plr
+                            end
                         end
                     end
                 end
-            end
-            return closest
-        end
-
-        local conn
-        conn = game:GetService("RunService").RenderStepped:Connect(function()
-            if not gui or not gui.Parent then conn:Disconnect() return end
-            if not AimbotEnabled then return end
-
-            if not LockedTarget or not LockedTarget.Character or not LockedTarget.Character:FindFirstChild("Head") then
-                LockedTarget = getClosestEnemy()
+                return closest
             end
 
-            if LockedTarget and LockedTarget.Character and LockedTarget.Character:FindFirstChild("Head") then
-                local part = LockedTarget.Character.Head
-                if LockedTarget.Character:FindFirstChild("Humanoid") and LockedTarget.Character.Humanoid.Health > 0 then
-                    Camera.CFrame = CFrame.new(Camera.CFrame.Position, part.Position)
-                else
-                    LockedTarget = nil
+            local conn
+            conn = game:GetService("RunService").RenderStepped:Connect(function()
+                if not gui or not gui.Parent then conn:Disconnect() return end
+                if not AimbotEnabled then return end
+
+                if not LockedTarget or not LockedTarget.Character or not LockedTarget.Character:FindFirstChild("Head") then
+                    LockedTarget = getClosestEnemy()
                 end
-            end
-        end)
-    end,
-})
 
-MiscTab:CreateButton({
-    Name = "Executar Aim",
-    Callback = function()
-        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-aimbot-universal-work-every-games-72835"))()
+                if LockedTarget and LockedTarget.Character and LockedTarget.Character:FindFirstChild("Head") then
+                    local part = LockedTarget.Character.Head
+                    if LockedTarget.Character:FindFirstChild("Humanoid") and LockedTarget.Character.Humanoid.Health > 0 then
+                        Camera.CFrame = CFrame.new(Camera.CFrame.Position, part.Position)
+                    else
+                        LockedTarget = nil
+                    end
+                end
+            end)
+        else
+            if existing then existing:Destroy() end
+        end
     end,
 })
 
