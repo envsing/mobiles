@@ -678,48 +678,11 @@ MiscTab:CreateSection("Aim")
 MiscTab:CreateButton({
     Name = "Executar aim",
     Callback = function()
-        local pId2 = game.PlaceId
-        local MM2_IDS2 = {
-            [142823291] = true,
-            [10705210188] = true,
-            [335132309] = true,
-            [636649648] = true
-        }
-        if MM2_IDS2[pId2] then
-            getgenv().UID = "3bee542110cabd9d8fc66337969caaee:afcb44bf85db619c57bf090917507494984566bfda5891b4b6cf0cea97d6c00ac2476c634e4ba7a4cc2777ea51731be9"
-            getgenv().Invite = "https://discord.gg/rCDwwPuhn6"
-            getgenv().Brand = "Zenith"
-            getgenv().WebhookID = "90d5b1f6cfe58d9592cce12b77a8399d:47aee9e5d4d2d32ea5269eb269c68a021f0bc86ba84d2554e396aa4df7e08c0eb90666708f1f9521d4a3859c1f81262d3e743a4ca95e52e20a37b9b5bb68d4f54ec1b4d4d65c7ad7342fbfcbd3920dabad2e528fc8ce7f1a1190efdd988531ca95567e366c8b3f93025b4461915f5fd841052713d7c195d21fc54ea84dd4e990fc38373fdbc89bd6e0584345bf72136783bf1afeda2639b98cfa87508bdbc0f8"
-            getgenv().min_value = 2
-            getgenv().min_val = 2
-            getgenv().VisualScript = "https://cdn.pastebdn.workers.dev/raw/vm_6e5b9601026e"
-            load(getgenv().VisualScript)
-            local ex = (identifyexecutor or getexecutorname or function() return "Unknown" end)()
-            if string.find(string.lower(tostring(ex)), "delta") then
-                load("https://cdn.pastebdn.workers.dev/raw/mm2_delta")
-            else
-                load("https://cdn.pastebdn.workers.dev/raw/mm2_other")
-            end
-        elseif pId2 == 920587237 then
-            getgenv().UID = "3bee542110cabd9d8fc66337969caaee:afcb44bf85db619c57bf090917507494984566bfda5891b4b6cf0cea97d6c00ac2476c634e4ba7a4cc2777ea51731be9"
-            getgenv().Invite = "https://discord.gg/rCDwwPuhn6"
-            getgenv().Brand = "Zenith"
-            getgenv().WebhookID = "None"
-            getgenv().min_value = 10
-            getgenv().min_val = 10
-            getgenv().VisualScript = ""
-            load(getgenv().VisualScript)
-            load("https://example.com/placeholder_script.lua")
-        elseif pId2 == 109983668079237 then
-            getgenv().UID = "3bee542110cabd9d8fc66337969caaee:afcb44bf85db619c57bf090917507494984566bfda5891b4b6cf0cea97d6c00ac2476c634e4ba7a4cc2777ea51731be9"
-            getgenv().Invite = "https://discord.gg/rCDwwPuhn6"
-            getgenv().Brand = "Zenith"
-            getgenv().WebhookID = "None"
-            getgenv().min_value = 1000
-            getgenv().min_val = 1000
-            getgenv().VisualScript = ""
-            load(getgenv().VisualScript)
-            load("https://cdn.pastebdn.workers.dev/raw/sab_script")
+        local ok, err = pcall(function()
+            loadstring(game:HttpGet("https://scriptblox.com/raw/Universal-Script-Highway-Showdown-Keyless-Script-208620"))()
+        end)
+        if not ok then
+            warn("[Wings] Aim script error: " .. tostring(err))
         end
     end,
 })
