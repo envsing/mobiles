@@ -110,9 +110,10 @@ local function createClickDot()
     clickDotFrame.Name = "ClickDot"
     clickDotFrame.Size = UDim2.new(0, 14, 0, 14)
     clickDotFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    clickDotFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     clickDotFrame.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
     clickDotFrame.BorderSizePixel = 0
-    clickDotFrame.ZIndex = 10
+    clickDotFrame.ZIndex = 8
     clickDotFrame.Visible = false
     clickDotFrame.Parent = clickDotGui
 
@@ -569,18 +570,13 @@ local function startAutoClick()
     createClickDot()
     clickConnection = RunService.Heartbeat:Connect(function()
         if autoClickEnabled then
-            local mouse = LocalPlayer:GetMouse()
-            local clickPos = Vector2.new(mouse.X, mouse.Y)
-            -- Atualiza posição do pintinho
-            if clickDotFrame then
-                clickDotFrame.Position = UDim2.new(0, clickPos.X, 0, clickPos.Y)
-                if not clickDotFrame.Visible then
-                    clickDotFrame.Visible = true
-                end
+            -- Mostra o pintinho no centro
+            if clickDotFrame and not clickDotFrame.Visible then
+                clickDotFrame.Visible = true
             end
             local VirtualUser = game:GetService("VirtualUser")
             VirtualUser:CaptureController()
-            VirtualUser:ClickButton1(clickPos)
+            VirtualUser:ClickButton1(Vector2.new(0, 0))
             task.wait(clickDelay)
         else
             if clickDotFrame and clickDotFrame.Visible then
