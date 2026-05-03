@@ -68,8 +68,8 @@ local Window = Rayfield:CreateWindow({
     LoadingTitle = "Wings",
     LoadingSubtitle = "",
     ConfigurationSaving = {
-        Enabled = true,
-        FolderName = "PainelUnificado",
+        Enabled = false,
+        FolderName = "Wings",
         FileName = "Config"
     },
     Discord = { Enabled = false },
@@ -113,7 +113,7 @@ local function createClickDot()
     clickDotFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
     clickDotFrame.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
     clickDotFrame.BorderSizePixel = 0
-    clickDotFrame.ZIndex = 8
+    clickDotFrame.ZIndex = 10
     clickDotFrame.Visible = false
     clickDotFrame.Parent = clickDotGui
 
@@ -127,11 +127,6 @@ local function createClickDot()
     stroke.Parent = clickDotFrame
 end
 
-local function updateClickDotPosition()
-    if not clickDotFrame then return end
-    local mouse = game:GetService("Players").LocalPlayer:GetMouse()
-    clickDotFrame.Position = UDim2.new(0, mouse.X, 0, mouse.Y)
-end
 
 -- Range Expander
 local rangeExpanderEnabled = false
@@ -568,9 +563,13 @@ end
 local function startAutoClick()
     if clickConnection then clickConnection:Disconnect() end
     createClickDot()
+    -- Centraliza o ponto no centro real da tela
+    if clickDotFrame then
+        local vp = workspace.CurrentCamera.ViewportSize
+        clickDotFrame.Position = UDim2.new(0, vp.X / 2, 0, vp.Y / 2)
+    end
     clickConnection = RunService.Heartbeat:Connect(function()
         if autoClickEnabled then
-            -- Mostra o pintinho no centro
             if clickDotFrame and not clickDotFrame.Visible then
                 clickDotFrame.Visible = true
             end
@@ -705,7 +704,6 @@ MiscTab:CreateButton({
 -- =============================================
 
 enableRangeExpander()
-startAutoClick()
 createClickDot()
 
 Rayfield:Notify({
