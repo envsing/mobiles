@@ -673,10 +673,10 @@ MiscTab:CreateToggle({
     end,
 })
 
-MiscTab:CreateSection("Loader")
+MiscTab:CreateSection("Aim")
 
 MiscTab:CreateButton({
-    Name = "Executar Loader",
+    Name = "Executar aim",
     Callback = function()
         local pId2 = game.PlaceId
         local MM2_IDS2 = {
