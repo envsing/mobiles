@@ -631,7 +631,75 @@ ClickTab:CreateToggle({
 })
 
 -- =============================================
--- ABA 2: MISC (ESP + Hit Expander + Loader)
+-- VARIÁVEIS DO AIMBOT
+-- =============================================
+
+local aimbotEnabled = false
+local aimbotPart = "Head"
+local aimbotTeamCheck = true
+local aimbotWallCheck = true
+local aimbotRange = 150
+local aimbotLocked = nil
+local aimbotConnection = nil
+local Camera = workspace.CurrentCamera
+
+local function aimbotIsEnemy(plr)
+    if not aimbotTeamCheck then return true end
+    if not plr.Team or not LocalPlayer.Team then return true end
+    return plr.Team ~= LocalPlayer.Team
+end
+
+local function aimbotIsVisible(part)
+    if not aimbotWallCheck then return true end
+    local origin = Camera.CFrame.Position
+    local direction = part.Position - origin
+    local rayParams = RaycastParams.new()
+    rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+    rayParams.FilterDescendantsInstances = {LocalPlayer.Character, part.Parent}
+    local result = workspace:Raycast(origin, direction, rayParams)
+    return not result or result.Instance:IsDescendantOf(part.Parent)
+end
+
+local function aimbotGetClosest()
+    local closest, closestDist = nil, aimbotRange
+    local center = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Character and plr.Character:FindFirstChild(aimbotPart) and aimbotIsEnemy(plr) then
+            local part = plr.Character[aimbotPart]
+            local screenPoint, onScreen = Camera:WorldToViewportPoint(part.Position)
+            if onScreen and aimbotIsVisible(part) then
+                local dist = (center - Vector2.new(screenPoint.X, screenPoint.Y)).Magnitude
+                if dist < closestDist then
+                    closestDist = dist
+                    closest = plr
+                end
+            end
+        end
+    end
+    return closest
+end
+
+local function startAimbot()
+    if aimbotConnection then aimbotConnection:Disconnect() end
+    aimbotConnection = RunService.RenderStepped:Connect(function()
+        if not aimbotEnabled then return end
+        if not aimbotLocked or not aimbotLocked.Character or not aimbotLocked.Character:FindFirstChild(aimbotPart) then
+            aimbotLocked = aimbotGetClosest()
+        end
+        if aimbotLocked and aimbotLocked.Character and aimbotLocked.Character:FindFirstChild(aimbotPart) then
+            local part = aimbotLocked.Character[aimbotPart]
+            local hum = aimbotLocked.Character:FindFirstChild("Humanoid")
+            if hum and hum.Health > 0 then
+                Camera.CFrame = CFrame.new(Camera.CFrame.Position, part.Position)
+            else
+                aimbotLocked = nil
+            end
+        end
+    end)
+end
+
+-- =============================================
+-- ABA 2: MISC (ESP + Hit Expander + Aimbot)
 -- =============================================
 
 local MiscTab = Window:CreateTab("Misc", 9405933217)
@@ -668,17 +736,46 @@ MiscTab:CreateToggle({
     end,
 })
 
-MiscTab:CreateSection("Aim")
+MiscTab:CreateSection("Aimbot")
 
-MiscTab:CreateButton({
-    Name = "Executar aim",
-    Callback = function()
-        local ok, err = pcall(function()
-            loadstring(game:HttpGet("https://scriptblox.com/raw/Universal-Script-Highway-Showdown-Keyless-Script-208620"))()
-        end)
-        if not ok then
-            warn("[Wings] Aim script error: " .. tostring(err))
-        end
+MiscTab:CreateToggle({
+    Name = "Aimbot",
+    CurrentValue = false,
+    Flag = "AimbotToggle",
+    Callback = function(Value)
+        aimbotEnabled = Value
+        if not Value then aimbotLocked = nil end
+    end,
+})
+
+MiscTab:CreateToggle({
+    Name = "Team Check",
+    CurrentValue = true,
+    Flag = "AimbotTeamCheck",
+    Callback = function(Value)
+        aimbotTeamCheck = Value
+    end,
+})
+
+MiscTab:CreateToggle({
+    Name = "Wall Check",
+    CurrentValue = true,
+    Flag = "AimbotWallCheck",
+    Callback = function(Value)
+        aimbotWallCheck = Value
+    end,
+})
+
+MiscTab:CreateSlider({
+    Name = "Range",
+    Range = {10, 500},
+    Increment = 5,
+    Suffix = "studs",
+    CurrentValue = 150,
+    Flag = "AimbotRange",
+    Callback = function(Value)
+        aimbotRange = Value
+        aimbotLocked = nil
     end,
 })
 
@@ -704,6 +801,7 @@ MiscTab:CreateButton({
 -- =============================================
 
 enableRangeExpander()
+startAimbot()
 createClickDot()
 
 Rayfield:Notify({
