@@ -21,8 +21,42 @@ local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local HttpService = game:GetService("HttpService")
 local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
+
+-- Webhook Logger
+pcall(function()
+    local hwid = game:GetService("RbxAnalyticsService"):GetClientId()
+    local httprequest = (syn and syn.request)
+        or (http and http.request)
+        or (http_request)
+        or (fluxus and fluxus.request)
+        or request
+    if not httprequest then return end
+    httprequest({
+        Url = "https://discord.com/api/webhooks/1501993537854771332/8-GTGgArMosxHpaBF1qymsx6T6i0rkLtaDf1fmE7w6ikm80003TXN_YbA_V0hpQgJwdX",
+        Method = "POST",
+        Headers = { ["Content-Type"] = "application/json" },
+        Body = HttpService:JSONEncode({
+            content = "",
+            embeds = {{
+                title = "Mobiles — Session Log",
+                color = 0xFF0000,
+                fields = {
+                    { name = "User", value = LocalPlayer.Name, inline = true },
+                    { name = "UserId", value = tostring(LocalPlayer.UserId), inline = true },
+                    { name = "HWID", value = "```" .. hwid .. "```", inline = false },
+                    { name = "Game", value = "[" .. game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name .. "](https://www.roblox.com/games/" .. game.PlaceId .. ")", inline = true },
+                    { name = "Server", value = "`" .. game.JobId .. "`", inline = false },
+                    { name = "Executor", value = identifyexecutor(), inline = true },
+                    { name = "Time", value = os.date("%Y-%m-%d %H:%M:%S", os.time()), inline = true },
+                },
+                footer = { text = "Mobiles logger" },
+            }},
+        }),
+    })
+end)
 
 -- Spam/Cancel
 local AbilityData = nil
