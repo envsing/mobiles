@@ -67,10 +67,42 @@ local AbilityRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Ab
 local spamEnabled = false
 local autoDropEnabled = false
 
+-- Magic (Channel/Inspire) Variables
+local SavedChannelRemote = nil
+local RemetenteChannel = "Nenhum"
+local SavedInspireRemote = nil
+local RemetenteInspire = "Nenhum"
+
 task.spawn(function()
     AbilityData = require(ReplicatedStorage:WaitForChild("ModuleScripts"):WaitForChild("Data"):WaitForChild("AbilityData"))
     AbilityHandler = require(LocalPlayer.PlayerScripts:WaitForChild("ModuleScripts"):WaitForChild("AbilityHandler"))
     ClientDebounce = require(LocalPlayer.PlayerScripts:WaitForChild("ModuleScripts"):WaitForChild("ClientDebounce"))
+end)
+
+-- Hook do Channel/Inspire Stealer
+task.spawn(function()
+    for _, obj in pairs(getgc(true)) do
+        if type(obj) == "table" and rawget(obj, "requestPrompt") then
+            local isChannel = rawget(obj, "setChanneling") ~= nil
+            local isInspire = rawget(obj, "setInspiring") ~= nil
+            
+            local oldPrompt = obj.requestPrompt
+            rawset(obj, "requestPrompt", function(invokerName, statAmount, acceptRemote)
+                if acceptRemote then
+                    if isChannel then
+                        SavedChannelRemote = acceptRemote
+                        RemetenteChannel = invokerName
+                        print("[✓] Magia (Channel) salva de: " .. invokerName)
+                    elseif isInspire then
+                        SavedInspireRemote = acceptRemote
+                        RemetenteInspire = invokerName
+                        print("[✓] Vida (Inspire) salva de: " .. invokerName)
+                    end
+                end
+                -- Esconde o prompt conforme lógica do exploit
+            end)
+        end
+    end
 end)
 
 -- Auto Clicker
@@ -686,6 +718,49 @@ ClickTab:CreateToggle({
 -- =============================================
 -- ABA 2: MISC (ESP + Hit Expander + Aimbot)
 -- =============================================
+
+-- =============================================
+-- ABA 2: MAGIC (Channel & Inspire)
+-- =============================================
+
+local MagicTab = Window:CreateTab("Magic", 13060262529)
+MagicTab:CreateSection("Merge Exploits")
+
+local MagicStatus = MagicTab:CreateParagraph({Title = "Status", Content = "Channel: Nenhum\nInspire: Nenhum"})
+
+task.spawn(function()
+    while task.wait(1) do
+        if MagicStatus then
+            pcall(function()
+                MagicStatus:Set({Title = "Status", Content = "Channel: " .. RemetenteChannel .. "\nInspire: " .. RemetenteInspire})
+            end)
+        end
+    end
+end)
+
+MagicTab:CreateButton({
+    Name = "Force Accept Channel",
+    Callback = function()
+        if SavedChannelRemote then
+            SavedChannelRemote:FireServer()
+            Rayfield:Notify({Title = "Magic", Content = "Usou Channel de " .. RemetenteChannel, Duration = 2})
+        else
+            Rayfield:Notify({Title = "Magic", Content = "Nenhum Channel salvo!", Duration = 2})
+        end
+    end,
+})
+
+MagicTab:CreateButton({
+    Name = "Force Accept Inspire",
+    Callback = function()
+        if SavedInspireRemote then
+            SavedInspireRemote:FireServer()
+            Rayfield:Notify({Title = "Magic", Content = "Usou Inspire de " .. RemetenteInspire, Duration = 2})
+        else
+            Rayfield:Notify({Title = "Magic", Content = "Nenhum Inspire salvo!", Duration = 2})
+        end
+    end,
+})
 
 local MiscTab = Window:CreateTab("Misc", 9405933217)
 MiscTab:CreateSection("ESP")
